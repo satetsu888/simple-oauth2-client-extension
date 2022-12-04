@@ -82,6 +82,12 @@ const auth = async(params) => {
           log(`[error] unknown client type: ${clientType}`)
       }
 
+      try {
+        JSON.stringify(response)
+      } catch (e) {
+        log(`[error] got malformed json response: ${response}, error: ${e}`)
+      }
+
       chrome.runtime.sendMessage({
           action: "result",
           value: JSON.stringify(response),
@@ -95,6 +101,7 @@ const publicClientTokenRequest = async(tokenEndpoint, body) => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json',
         },
         body: body.toString(),
     }).then(response => response.json()).then(data => {
@@ -106,6 +113,7 @@ const publicClientTokenRequest = async(tokenEndpoint, body) => {
 const confidentialClientTokenRequest = async(tokenEndpoint, clientId, clientSecret, body, tokenRequstAuth) => {
     const headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
     }
 
     if (tokenRequstAuth === 'header') {
