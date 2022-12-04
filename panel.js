@@ -10,6 +10,21 @@ const result = (string) => {
 }
 
 window.onload = () => {
+  const redirect_uri = document.getElementById("redirect_uri");
+  redirect_uri.value = `https://${chrome.runtime.id}.chromiumapp.org/`
+
+  const copy_redirect_uri_button = document.getElementById("copy_redirect_uri_button");
+  copy_redirect_uri_button.onclick = () => {
+    redirect_uri.select();
+    redirect_uri.setSelectionRange(0, 99999); 
+    document.execCommand("copy")
+
+    copy_redirect_uri_button.innerText = "copied!"
+    setTimeout(() => {
+      copy_redirect_uri_button.innerText = "copy"
+    }, 1000);
+  }
+
   const form = document.getElementById("form");
   form.onsubmit = async (e) => {
     e.preventDefault();
