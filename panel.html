@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="./panel.js"></script>
+  </head>
+  <body>
+    <form id="form">
+      <fieldset>
+        <legend>API Information</legend>
+        <div>
+          <label for="authorization_endpoint">Authorization Endpoint</label>
+          <input type="url" name="authorization_endpoint" placeholder="https://example.com/authrize" size="40" form="form"  required />
+        </div>
+    
+        <div>
+          <label for="token_endpoint">Token Endpoint</label>
+          <input type="url" name="token_endpoint" placeholder="https://api.example.com/token" size="40" required />
+        </div>
+      </fieldset>
+    
+      <fieldset>
+        <legend>Client Config</legend>
+        <div>
+          Client Type
+          <input type="radio" id="client_type_public" name="client_type" value="public" checked />
+          <label for="client_type_public">Public</label>
+    
+          <input type="radio" id="client_type_confidential" name="client_type" value="confidential" />
+          <label for="client_type_confidential">Confidential</label>
+        </div>
+    
+        <div>
+          <label for="client_id">Client ID</label>
+          <input type="text" name="client_id" size="30" />
+        </div>
+    
+        <div>
+          <label for="client_secret">Client Secret</label>
+          <input type="text" name="client_secret" size="30" />
+        </div>
+    
+        <div>
+          <label for="scope">scope</label>
+          <input type="text" name="scope" />
+        </div>
+    
+        <div>
+          <label for="redirect_uri">redirect_uri</label>
+          <input type="text" name="redirect_uri" value="https://nackhihdnafeenhgbmifgcmfhgickeph.chromiumapp.org/" readonly size="40" />
+        </div>
+      </fieldset>
+    
+      <fieldset>
+        <legend>Request Config</legend>
+        <div>
+          PKCE
+          <input type="radio" id="pkce_s256" name="pkce" value="S256" checked />
+          <label for="pkce_s256">S256</label>
+    
+          <input type="radio" id="pkce_plain" name="pkce" value="plain" />
+          <label for="pkce_plain">plain</label>
+    
+          <input type="radio" id="pkce_no" name="pkce" value="no" />
+          <label for="pkce_no">not use</label>
+        </div>
+
+        <div>
+          Auth Method
+          <input type="radio" id="token_request_auth_header" name="token_request_auth" value="header" checked />
+          <label for="token_request_auth_header">Authorization Header</label>
+    
+          <input type="radio" id="token_request_auth_body" name="token_request_auth" value="body" />
+          <label for="token_request_auth_body">Body Parameter</label>
+        </div>
+
+        <div>
+          <input type="checkbox" id="use_curl" name="use_curl" disabled>
+          <label for="use_curl">Show TokenRequest cURL command (not implemented yet...)</label>
+        </div>
+      </fieldset>
+
+      <input type="submit" id="submit" value="Start Auth" />
+    </form>
+
+    <br>
+    <br>
+
+    log
+    <div>
+      <textarea id="log" cols="60" rows="10"></textarea>
+    <div>
+    result
+    </div>
+      <textarea id="result" cols="60" rows="4"></textarea>
+    </div>
+  </body>
+</html>

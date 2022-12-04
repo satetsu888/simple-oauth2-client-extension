@@ -1,0 +1,16 @@
+{
+    "name": "Simple OAuth2 Client",
+    "description": "A simple OAuth2 client chrome extension to get access token via authorization code flow for development usage",
+    "version": "0.1.0",
+    "permissions": [
+        "identity"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "devtools_page": "devtools.html",
+    "manifest_version": 3
+}
