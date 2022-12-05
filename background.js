@@ -50,7 +50,8 @@ const auth = async(params) => {
   const pkceParam = params['pkce']
   const tokenRequstAuth = params['token_request_auth']
 
-  const PKCECodeVerifier = 'codeVerifier'
+  const PKCECodeVerifier = generateCodeVerifier()
+  log(`generate code_verifier: ${PKCECodeVerifier}`)
   const authorizationUrl = await buildAuthorizationUrl(params, PKCECodeVerifier)
   log(`build authorizationUrl: ${authorizationUrl}`)
 
