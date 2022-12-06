@@ -10,7 +10,7 @@
         "<all_urls>"
     ],
     "background": {
-        "service_worker": "background.js"
+        "service_worker": "./dist/background.js"
     },
     "devtools_page": "devtools.html",
     "manifest_version": 3
