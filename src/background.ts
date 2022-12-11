@@ -7,30 +7,30 @@ const backgroundLog = (string: string): void => {
     }, () => {});
 }
 
-const buildAuthorizationUrl = async (params: InputParams, PKCECodeVerifier: string) => {
+const buildAuthorizationUrl = async (params: AuthInputParams, PKCECodeVerifier: string) => {
   const url = new URL(params.authorizationEndpoint)
   url.searchParams.set('client_id', params.clientId)
   url.searchParams.set('redirect_uri', params.redirectUri)
   url.searchParams.set('response_type', 'code')
   url.searchParams.set('state', 'state')
   url.searchParams.set('scope', params.scope)
-  if (params.pkceParam === 'S256') {
+  if (params.codeChallengeMethod === 'S256') {
       const codeChallenge = await generateCodeChallenge(PKCECodeVerifier)
       url.searchParams.set('code_challenge_method', 'S256')
       url.searchParams.set('code_challenge', codeChallenge)
-  } else if (params.pkceParam === 'plain') {
+  } else if (params.codeChallengeMethod === 'plain') {
       url.searchParams.set('code_challenge_method', 'plain')
       url.searchParams.set('code_challenge', PKCECodeVerifier)
-  } else if (params.pkceParam === 'no') {
+  } else if (params.codeChallengeMethod === 'no') {
     // do nothing
   } else {
-    backgroundLog(`[error] unknown pkce param: ${params.pkceParam}`)
+    backgroundLog(`[error] unknown pkce param: ${params.codeChallengeMethod}`)
   }
 
   return url.toString()
 }
 
-const auth = async(params: InputParams) => {
+const auth = async(params: AuthInputParams) => {
   backgroundLog(`params: ${JSON.stringify(params)}`)
 
   const PKCECodeVerifier = generateCodeVerifier()
@@ -63,7 +63,7 @@ const auth = async(params: InputParams) => {
           redirect_uri: params.redirectUri,
           code: code,
       })
-      if (params.pkceParam !== 'no') {
+      if (params.codeChallengeMethod !== 'no') {
         body.append('code_verifier', PKCECodeVerifier)
       }
 
