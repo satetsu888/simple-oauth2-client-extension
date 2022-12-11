@@ -76,7 +76,7 @@ const auth = async(params: InputParams) => {
             params.clientId,
             params.clientSecret,
             body,
-            params.tokenRequestAuth
+            params.tokenEndpointAuthMethod
           );
       } else {
           backgroundLog(`[error] unknown client type: ${params.clientType}`)
@@ -110,17 +110,17 @@ const publicClientTokenRequest = async(tokenEndpoint: string, body: URLSearchPar
     return data
 }
 
-const confidentialClientTokenRequest = async(tokenEndpoint: string, clientId: string, clientSecret: string, body: URLSearchParams, tokenRequstAuth: string) => {
+const confidentialClientTokenRequest = async(tokenEndpoint: string, clientId: string, clientSecret: string, body: URLSearchParams, tokenRequstAuth: TokenEndPointAuthMethod) => {
     const headers: {[key: string]: string} = {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Accept': 'application/json',
     }
 
-    if (tokenRequstAuth === 'header') {
+    if (tokenRequstAuth === 'client_secret_basic') {
         const authHeader = 'Basic ' + btoa(`${clientId}:${clientSecret}`);
         backgroundLog(`using Authorization header: ${authHeader}`)
         headers['Authorization'] = authHeader
-    } else if (tokenRequstAuth === 'body') {
+    } else if (tokenRequstAuth === 'client_secret_post') {
         backgroundLog(`set authorization params in body`)
         body.append('client_secret', clientSecret)
     } else {

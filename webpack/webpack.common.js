@@ -6,7 +6,7 @@ module.exports = {
     entry: {
       background: path.join(srcDir, 'background.ts'),
       devtools: path.join(srcDir, 'devtools.ts'),
-      panel: path.join(srcDir, 'panel.ts'),
+      panel: path.join(srcDir, 'panel.tsx'),
     },
     output: {
         path: path.join(__dirname, "../dist"),
