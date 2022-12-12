@@ -8,7 +8,7 @@ const Panel = (props: Props) => {
   const redirectUri = `https://${chrome.runtime.id}.chromiumapp.org/`
 
   const defaultConfig: AuthFormConfig = {
-    issuer: "CustomProvider",
+    name: "CustomProvider",
     authorizationEndpoint: null,
     tokenEndpoint: null,
     clientTypesSupported: ["public", "confidential"],
@@ -16,6 +16,9 @@ const Panel = (props: Props) => {
     codeChallengeMethodSupported: ["S256", "plain", "no"],
     tokenEndpointAuthMethodSupported: ["client_secret_basic", "client_secret_post"],
   }
+
+  const [platformConfigMap, setPlatformConfigMap] = useState<Map<string, AuthFormConfig>>(new Map([[defaultConfig.name, defaultConfig]]))
+  const [authConfig, setAuthConfig] = useState<AuthFormConfig>(defaultConfig)
 
   const [log, setLog] = useState<string>("")
   const [result, setResult] = useState<string>("")
@@ -42,10 +45,48 @@ const Panel = (props: Props) => {
     }
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      const metadataRes = await fetch("https://raw.githubusercontent.com/satetsu888/simple-oauth2-client-extension/main/api/platform_metadata.json")
+      const metaJson = await metadataRes.json()
+
+      const configs: AuthFormConfig[] = await Promise.all(metaJson.map(async(platform: any): Promise<AuthFormConfig> => {
+        const configRes = await fetch(platform.metadata)
+        const configJson = await configRes.json()
+        return {
+          name: platform.name,
+          authorizationEndpoint: configJson.authorization_endpoint,
+          tokenEndpoint: configJson.token_endpoint,
+          clientTypesSupported: configJson.client_types_supported || ["public", "confidential"],
+          scopesSupported: configJson.scopes_supported,
+          codeChallengeMethodSupported: configJson.code_challenge_methods_supported,
+          tokenEndpointAuthMethodSupported: configJson.token_endpoint_auth_methods_supported,
+        }
+      }))
+
+      const configMap = new Map(configs.map(config => [config.name, config]));
+      configMap.set(defaultConfig.name, defaultConfig)
+      setPlatformConfigMap(configMap)
+    })()
+  }, [])
+
   return (
     <>
+      <label htmlFor="provider_select">
+        Provider
+      </label>
+      <select
+        id="provider_select"
+        onChange={(e) => {
+          platformConfigMap.get(e.target.value) && setAuthConfig(platformConfigMap.get(e.target.value)!)
+        }}
+      >
+        {Array.from(platformConfigMap.values()).map(config => {
+          return <option value={config.name} key={config.name}>{config.name}</option>
+        })}
+      </select>
       <AuthForm
-        config={defaultConfig}
+        config={authConfig}
         redirectUri={redirectUri}
         onSubmit={(params) => {
           setLog("");

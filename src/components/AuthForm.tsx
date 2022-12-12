@@ -38,8 +38,8 @@ const AuthForm = (props: Props) => {
           e.preventDefault();
 
           const params = {
-            authorizationEndpoint,
-            tokenEndpoint,
+            authorizationEndpoint: config.authorizationEndpoint || authorizationEndpoint,
+            tokenEndpoint: config.tokenEndpoint || tokenEndpoint,
             clientType,
             clientId,
             clientSecret,
@@ -64,7 +64,7 @@ const AuthForm = (props: Props) => {
               size={40}
               form="form"
               required
-              value={authorizationEndpoint}
+              value={config.authorizationEndpoint || authorizationEndpoint}
               onChange={(e) => setAuthorizationEndpoint(e.target.value)}
               readOnly={config.authorizationEndpoint !== null}
             />
@@ -78,9 +78,9 @@ const AuthForm = (props: Props) => {
               placeholder="https://api.example.com/token"
               size={40}
               required
-              value={tokenEndpoint}
+              value={config.tokenEndpoint || tokenEndpoint}
               onChange={(e) => setTokenEndpoint(e.target.value)}
-              readOnly={config.authorizationEndpoint !== null}
+              readOnly={config.tokenEndpoint !== null}
             />
           </div>
         </fieldset>

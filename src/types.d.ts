@@ -28,7 +28,7 @@ declare type OAuthMetaData = {
 }
 
 declare type AuthFormConfig = {
-    issuer: string;
+    name: string;
     authorizationEndpoint: string | null;
     tokenEndpoint: string | null;
     clientTypesSupported: ClientType[];
