@@ -72,17 +72,21 @@ const Panel = (props: Props) => {
 
   return (
     <>
-      <label htmlFor="provider_select">
-        Provider
-      </label>
+      <label htmlFor="provider_select">Provider</label>
       <select
         id="provider_select"
         onChange={(e) => {
-          platformConfigMap.get(e.target.value) && setAuthConfig(platformConfigMap.get(e.target.value)!)
+          platformConfigMap.get(e.target.value) &&
+            setAuthConfig(platformConfigMap.get(e.target.value)!);
         }}
+        style={{ marginLeft: "8px" }}
       >
-        {Array.from(platformConfigMap.values()).map(config => {
-          return <option value={config.name} key={config.name}>{config.name}</option>
+        {Array.from(platformConfigMap.values()).map((config) => {
+          return (
+            <option value={config.name} key={config.name}>
+              {config.name}
+            </option>
+          );
         })}
       </select>
       <AuthForm
@@ -104,9 +108,15 @@ const Panel = (props: Props) => {
       <br />
       <br />
       <div>log</div>
-      <textarea id="log" cols={60} rows={10} value={log} ref={logRef} />
+      <textarea
+        id="log"
+        cols={80}
+        rows={10}
+        value={log}
+        ref={logRef}
+      />
       <div>result</div>
-      <textarea id="result" cols={60} rows={4} value={result} />
+      <textarea id="result" cols={80} rows={4} value={result} />
     </>
   );
 }
