@@ -1,0 +1,56 @@
+body {
+    color: #333;
+}
+#submit {
+    color: #0275ff;
+    font-weight: 600;
+    font-size: 12px;
+    background-color: white;
+    border: 2px solid lightgray;
+    border-radius: 4px;
+    padding-right: 12px;
+    padding-left: 12px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+
+    margin-left: 2px;
+}
+
+#submit:hover {
+    background-color: #f2f2f2;
+}
+
+#submit:active {
+    background-color: #f2f2f2;
+    border: 2px solid #0275ff;
+}
+
+#copy_redirect_uri_button {
+    color: #0275ff;
+    background-color: white;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    padding-right: 8px;
+    padding-left: 8px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+#copy_redirect_uri_button:hover {
+    background-color: #f2f2f2;
+}
+
+#copy_redirect_uri_button:active {
+    background-color: #f2f2f2;
+    border: 2px solid #0275ff;
+}
+
+fieldset {
+    border: 2px solid lightgray;
+    border-radius: 4px;
+}
+
+input[type="text"] {
+    border: 1px solid lightgray;
+    border-radius: 2px;
+}

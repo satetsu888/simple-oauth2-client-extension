@@ -106,7 +106,6 @@ const Panel = (props: Props) => {
         }}
       />
       <br />
-      <br />
       <div>log</div>
       <textarea
         id="log"

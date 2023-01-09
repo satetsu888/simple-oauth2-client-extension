@@ -231,9 +231,9 @@ const AuthForm = (props: Props) => {
                 name="redirect_uri"
                 value={redirectUri}
                 readOnly
-                size={55}
+                size={35}
                 style={{
-                  backgroundColor: "whitesmoke",
+                  backgroundColor: "lightgray",
                   border: "1px solid lightgray",
                 }}
               />
@@ -368,7 +368,11 @@ const AuthForm = (props: Props) => {
             */}
         </fieldset>
 
-        <input type="submit" id="submit" value="Start Auth" />
+        <input
+          type="submit"
+          id="submit"
+          value="Start Auth"
+        />
       </form>
     </>
   );
