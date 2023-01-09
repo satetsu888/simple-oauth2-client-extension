@@ -231,7 +231,7 @@ const AuthForm = (props: Props) => {
                 name="redirect_uri"
                 value={redirectUri}
                 readOnly
-                size={35}
+                size={40}
                 style={{
                   backgroundColor: "lightgray",
                   border: "1px solid lightgray",
