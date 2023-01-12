@@ -24,12 +24,7 @@ So I made this.
 
 ## Installation
 
-- [Download](https://github.com/satetsu888/simple-oauth2-client-extension/archive/refs/heads/main.zip) zip file
-- Extract it
-- Open chrome extension management page ( chrome://extensions/ )
-- Enable developer mode
-- Click load unpacked extension
-- Select the extracted directory
+https://chrome.google.com/webstore/detail/simple-oauth2-client/bmcbmjlmbpndabffoeejkfaknnknioej
 
 ## Usage
 
