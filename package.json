@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "webpack --config webpack/webpack.dev.js --watch",
     "build": "webpack --config webpack/webpack.prod.js",
-    "zip": "yarn run build && zip -r simple-oauth2-client-extension.zip dist/* css/* manifest.json *.html"
+    "zip": "yarn run build && zip -r simple-oauth2-client-extension.zip dist/* css/* packed_img/* manifest.json *.html"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.203",

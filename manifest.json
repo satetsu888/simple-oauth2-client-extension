@@ -1,7 +1,12 @@
 {
     "name": "Simple OAuth2 Client",
     "description": "A simple OAuth2 client chrome extension to get access token via authorization code flow for development usage",
-    "version": "0.1.0",
+    "version": "0.1.1",
+    "icons": {
+        "16": "./packed_img/icon16x16.png",
+        "32": "./packed_img/icon32x32.png",
+        "128": "./packed_img/icon128x128.png"
+    },
     "permissions": [
         "identity",
         "clipboardWrite"
