@@ -19,6 +19,9 @@ const Panel = (props: Props) => {
 
   const [platformConfigMap, setPlatformConfigMap] = useState<Map<string, AuthFormConfig>>(new Map([[defaultConfig.name, defaultConfig]]))
   const [authConfig, setAuthConfig] = useState<AuthFormConfig>(defaultConfig)
+  const [copyButtonText, setCopyButtonText] = useState("copy access token");
+  const [accessToken, setAccessToken] = useState("")
+  const accessTokenInputRef = useRef<HTMLInputElement>(null);
 
   const [log, setLog] = useState<string>("")
   const [result, setResult] = useState<string>("")
@@ -35,6 +38,18 @@ const Panel = (props: Props) => {
         logRef.current?.scrollTo(0, logRef.current.scrollHeight);
       } else if (message.action === "result") {
         setResult(message.value);
+
+        try {
+          const parsed = JSON.parse(message.value);
+          if (parsed["access_token"]) {
+            setAccessToken(parsed["access_token"]);
+          }
+        } catch (e) {
+          setLog((prev) => {
+            return prev + e + "\n";
+          });
+          console.error(e);
+        }
       }
 
       return true;
@@ -70,6 +85,12 @@ const Panel = (props: Props) => {
     })()
   }, [])
 
+  useEffect(() => {
+    setTimeout(() => {
+      setCopyButtonText("copy access token");
+    }, 1000);
+  }, [copyButtonText]);
+
   return (
     <>
       <label htmlFor="provider_select">Provider</label>
@@ -95,6 +116,7 @@ const Panel = (props: Props) => {
         onSubmit={(params) => {
           setLog("");
           setResult("");
+          setAccessToken("");
 
           chrome.runtime.sendMessage(
             {
@@ -107,15 +129,41 @@ const Panel = (props: Props) => {
       />
       <br />
       <div>log</div>
-      <textarea
-        id="log"
-        cols={80}
-        rows={10}
-        value={log}
-        ref={logRef}
-      />
+      <textarea id="log" cols={80} rows={10} value={log} ref={logRef} />
       <div>result</div>
       <textarea id="result" cols={80} rows={4} value={result} />
+      <br />
+      <button
+        id="copy_access_token_button"
+        type="button"
+        onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+          const newInput = document.createElement("input");
+          newInput.type = "text";
+          newInput.value = accessToken;
+          document.body.appendChild(newInput);
+          newInput.select();
+          newInput.setSelectionRange(0, 99999);
+          document.execCommand("copy");
+          document.body.removeChild(newInput);
+
+          setCopyButtonText("copied!");
+        }}
+        disabled={accessToken === ""}
+      >
+        {copyButtonText}
+      </button>
+      {accessToken !== "" && (
+        <p
+          style={{ color: "gray" }}
+        >
+          Thank you for using extension 🎉. As this is donationware, please
+          consider
+          {' '}<a href="https://www.buymeacoffee.com/satetsu888" target="_blank">donation</a>{' '}
+          or
+          {' '}<a href="https://chrome.google.com/webstore/detail/simple-oauth2-client/bmcbmjlmbpndabffoeejkfaknnknioej" target="_blank">post your review</a>{' '}
+          if this helps your work!
+        </p>
+      )}
     </>
   );
 }
