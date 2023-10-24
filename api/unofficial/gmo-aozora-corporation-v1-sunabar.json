@@ -2,6 +2,7 @@
   "issuer": "https://api.sunabar.gmo-aozora.com",
   "authorization_endpoint": "https://api.sunabar.gmo-aozora.com/ganb/api/auth/v1/authorization",
   "token_endpoint": "https://api.sunabar.gmo-aozora.com/ganb/api/auth/v1/token",
+  "client_types_supported": ["confidential"],
   "response_types_supported": ["code"],
   "scopes_supported": [
     "private:account",
@@ -15,6 +16,6 @@
     "client_secret_basic"
   ],
   "code_challenge_methods_supported": ["plain", "S256", "no"],
-  "grant_types_supported": ["authorization_code"],
+  "grant_types_supported": ["authorization_code", "refresh_token"],
   "service_documentation": "https://gmo-aozora.com/baas/api-cooperation/api-specification.html"
 }
