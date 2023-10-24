@@ -59,7 +59,6 @@ const auth = async(params: AuthInputParams) => {
 
       const body = createURLSearchParams({
           grant_type: 'authorization_code',
-          client_id: params.clientId,
           redirect_uri: params.redirectUri,
           code: code,
       })
@@ -69,7 +68,7 @@ const auth = async(params: AuthInputParams) => {
 
       var response
       if (params.clientType === 'public') {
-          response = await publicClientTokenRequest(params.tokenEndpoint, body)
+          response = await publicClientTokenRequest(params.tokenEndpoint, params.clientId, body)
       } else if (params.clientType === 'confidential') {
           response = await confidentialClientTokenRequest(
             params.tokenEndpoint,
@@ -95,7 +94,9 @@ const auth = async(params: AuthInputParams) => {
   });
 }
 
-const publicClientTokenRequest = async(tokenEndpoint: string, body: URLSearchParams) => {
+const publicClientTokenRequest = async(tokenEndpoint: string, clientId: string, body: URLSearchParams) => {
+    body.append('client_id', clientId)
+
     backgroundLog(`token request body for public client: ${body}`)
     const data = await fetch(tokenEndpoint, {
         method: 'POST',
@@ -122,6 +123,7 @@ const confidentialClientTokenRequest = async(tokenEndpoint: string, clientId: st
         headers['Authorization'] = authHeader
     } else if (tokenRequstAuth === 'client_secret_post') {
         backgroundLog(`set authorization params in body`)
+        body.append('client_id', clientId)
         body.append('client_secret', clientSecret)
     } else {
         backgroundLog(`[error] unknown token request auth: ${tokenRequstAuth}`)
