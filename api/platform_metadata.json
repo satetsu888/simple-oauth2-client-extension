@@ -1,13 +1,38 @@
 [
     {
-        "name": "Twitter V2",
-        "type": "oauth2",
-        "metadata": "https://raw.githubusercontent.com/satetsu888/simple-oauth2-client-extension/main/api/unofficial/twitter-v2.json"
-    },
-    {
         "name": "Google",
         "type": "oidc",
         "metadata": "https://accounts.google.com/.well-known/openid-configuration"
+    },
+    {
+        "name": "Microsoft",
+        "type": "oidc",
+        "metadata": "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
+    },
+    {
+        "name": "Apple ID",
+        "type": "oidc",
+        "metadata": "https://appleid.apple.com/.well-known/openid-configuration"
+    },
+    {
+        "name": "Slack",
+        "type": "oidc",
+        "metadata": "https://api.slack.com/.well-known/openid-configuration"
+    },
+    {
+        "name": "LINE",
+        "type": "oidc",
+        "metadata": "https://access.line.me/.well-known/openid-configuration"
+    },
+    {
+        "name": "Paypal",
+        "type": "oidc",
+        "metadata": "https://www.paypalobjects.com/.well-known/openid-configuration"
+    },
+    {
+        "name": "Twitter V2",
+        "type": "oauth2",
+        "metadata": "https://raw.githubusercontent.com/satetsu888/simple-oauth2-client-extension/main/api/unofficial/twitter-v2.json"
     },
     {
         "name": "gmo-aozora corporation V1 sunabar",
