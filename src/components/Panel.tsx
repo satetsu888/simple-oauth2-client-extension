@@ -71,11 +71,11 @@ const Panel = (props: Props) => {
         return {
           name: platform.name,
           authorizationEndpoint: configJson.authorization_endpoint,
-          tokenEndpoint: configJson.token_endpoint,
-          clientTypesSupported: configJson.client_types_supported || ["public", "confidential"],
-          scopesSupported: configJson.scopes_supported,
-          codeChallengeMethodSupported: configJson.code_challenge_methods_supported,
-          tokenEndpointAuthMethodSupported: configJson.token_endpoint_auth_methods_supported,
+          tokenEndpoint: configJson.token_endpoint || defaultConfig.tokenEndpoint,
+          clientTypesSupported: configJson.client_types_supported || defaultConfig.clientTypesSupported,
+          scopesSupported: configJson.scopes_supported || defaultConfig.scopesSupported,
+          codeChallengeMethodSupported: configJson.code_challenge_methods_supported || defaultConfig.codeChallengeMethodSupported,
+          tokenEndpointAuthMethodSupported: configJson.token_endpoint_auth_methods_supported || defaultConfig.tokenEndpointAuthMethodSupported,
         }
       }))
 
