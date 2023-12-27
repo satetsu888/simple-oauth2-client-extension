@@ -5,6 +5,26 @@
         "metadata": "https://accounts.google.com/.well-known/openid-configuration"
     },
     {
+        "name": "Microsoft",
+        "type": "oidc",
+        "metadata": "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
+    },
+    {
+        "name": "Apple ID",
+        "type": "oidc",
+        "metadata": "https://appleid.apple.com/.well-known/openid-configuration"
+    },
+    {
+        "name": "Slack",
+        "type": "oidc",
+        "metadata": "https://api.slack.com/.well-known/openid-configuration"
+    },
+    {
+        "name": "LINE",
+        "type": "oidc",
+        "metadata": "https://access.line.me/.well-known/openid-configuration"
+    },
+    {
         "name": "Paypal",
         "type": "oidc",
         "metadata": "https://www.paypalobjects.com/.well-known/openid-configuration"
