@@ -9,7 +9,8 @@
     },
     "permissions": [
         "identity",
-        "clipboardWrite"
+        "clipboardWrite",
+        "sidePanel"
     ],
     "host_permissions": [
         "<all_urls>"
@@ -17,6 +18,11 @@
     "background": {
         "service_worker": "./dist/background.js"
     },
+    "action": {},
+    "side_panel": {
+        "default_path": "panel.html"
+    },
     "devtools_page": "devtools.html",
+    "minimum_chrome_version": "114",
     "manifest_version": 3
 }

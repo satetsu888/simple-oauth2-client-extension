@@ -9,7 +9,7 @@
     "zip": "yarn run build && zip -r simple-oauth2-client-extension.zip dist/* css/* packed_img/* manifest.json *.html"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.203",
+    "@types/chrome": "^0.1.40",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",
     "ts-loader": "^9.4.2",

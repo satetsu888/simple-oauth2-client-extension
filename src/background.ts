@@ -148,3 +148,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
     return true
 });
+
+chrome.sidePanel
+  .setPanelBehavior({ openPanelOnActionClick: true })
+  .catch((error) => console.error(error));

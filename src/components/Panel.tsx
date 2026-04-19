@@ -129,24 +129,20 @@ const Panel = (props: Props) => {
       />
       <br />
       <div>log</div>
-      <textarea id="log" cols={80} rows={10} value={log} ref={logRef} />
+      <textarea id="log" cols={80} rows={10} value={log} ref={logRef} readOnly />
       <div>result</div>
-      <textarea id="result" cols={80} rows={4} value={result} />
+      <textarea id="result" cols={80} rows={4} value={result} readOnly />
       <br />
       <button
         id="copy_access_token_button"
         type="button"
-        onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-          const newInput = document.createElement("input");
-          newInput.type = "text";
-          newInput.value = accessToken;
-          document.body.appendChild(newInput);
-          newInput.select();
-          newInput.setSelectionRange(0, 99999);
-          document.execCommand("copy");
-          document.body.removeChild(newInput);
-
-          setCopyButtonText("copied!");
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(accessToken);
+            setCopyButtonText("copied!");
+          } catch (e) {
+            setLog((prev) => prev + `[error] failed to copy: ${e}\n`);
+          }
         }}
         disabled={accessToken === ""}
       >
