@@ -8,11 +8,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## コマンド
 
-パッケージマネージャは Yarn (`yarn.lock` を使用)。
+パッケージマネージャは npm (`package-lock.json` を使用)。Node.js のバージョンは `.node-version` および `package.json` の `engines` で `24.15.0` を指定。
 
-- `yarn watch` — webpack 開発ビルドを監視モードで起動 (`webpack/webpack.dev.js`)
-- `yarn build` — 本番ビルド (`webpack/webpack.prod.js` → `dist/`)
-- `yarn zip` — ビルド後、Chrome Web Store にアップロードするための zip を生成
+- `npm run watch` — webpack 開発ビルドを監視モードで起動 (`webpack/webpack.dev.js`)
+- `npm run build` — 本番ビルド (`webpack/webpack.prod.js` → `dist/`)
+- `npm run zip` — ビルド後、Chrome Web Store にアップロードするための zip を生成
 
 ビルド出力 (`dist/`) を確認する系の操作は AI が実行してよい。サーバー起動を伴う動作確認 (拡張機能のリロード・実 OAuth フローでの動作チェック等) はユーザー側で行う。
 
@@ -52,4 +52,4 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `src/types.d.ts` は `declare type` のグローバル宣言。import せずに使う。
 - `manifest.json` の `version` と Chrome Web Store のリリースは別管理 (リリース時に手動で更新)。
-- `dist/` は git 管理対象 (`zip` タスクで配布物に含めるため)。ビルド変更時はコミットに含める。
+- `dist/` は gitignore 対象。`zip` タスク実行前に `npm run build` でビルド成果物を生成する (`zip` スクリプトが内部で `npm run build` を呼ぶため通常は意識不要)。

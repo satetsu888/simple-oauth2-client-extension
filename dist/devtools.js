@@ -1,1 +1,0 @@
-(()=>{"use strict";chrome.devtools.panels.create("Simple OAuth2 Client","","panel.html",(()=>{}))})();
