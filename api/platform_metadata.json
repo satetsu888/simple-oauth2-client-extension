@@ -15,9 +15,39 @@
         "metadata": "https://appleid.apple.com/.well-known/openid-configuration"
     },
     {
+        "name": "Discord",
+        "type": "oidc",
+        "metadata": "https://discord.com/.well-known/openid-configuration"
+    },
+    {
+        "name": "GitLab",
+        "type": "oidc",
+        "metadata": "https://gitlab.com/.well-known/openid-configuration"
+    },
+    {
+        "name": "LinkedIn",
+        "type": "oidc",
+        "metadata": "https://www.linkedin.com/oauth/.well-known/openid-configuration"
+    },
+    {
+        "name": "Salesforce",
+        "type": "oidc",
+        "metadata": "https://login.salesforce.com/.well-known/openid-configuration"
+    },
+    {
         "name": "Slack",
         "type": "oidc",
         "metadata": "https://api.slack.com/.well-known/openid-configuration"
+    },
+    {
+        "name": "Spotify",
+        "type": "oidc",
+        "metadata": "https://accounts.spotify.com/.well-known/openid-configuration"
+    },
+    {
+        "name": "Twitch",
+        "type": "oidc",
+        "metadata": "https://id.twitch.tv/oauth2/.well-known/openid-configuration"
     },
     {
         "name": "LINE",
@@ -28,6 +58,21 @@
         "name": "Paypal",
         "type": "oidc",
         "metadata": "https://www.paypalobjects.com/.well-known/openid-configuration"
+    },
+    {
+        "name": "Yahoo",
+        "type": "oidc",
+        "metadata": "https://api.login.yahoo.com/.well-known/openid-configuration"
+    },
+    {
+        "name": "GitHub",
+        "type": "oauth2",
+        "metadata": "https://raw.githubusercontent.com/satetsu888/simple-oauth2-client-extension/main/api/unofficial/github.json"
+    },
+    {
+        "name": "Facebook",
+        "type": "oauth2",
+        "metadata": "https://raw.githubusercontent.com/satetsu888/simple-oauth2-client-extension/main/api/unofficial/facebook.json"
     },
     {
         "name": "Twitter V2",
