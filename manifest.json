@@ -10,7 +10,8 @@
     "permissions": [
         "identity",
         "clipboardWrite",
-        "sidePanel"
+        "sidePanel",
+        "scripting"
     ],
     "host_permissions": [
         "<all_urls>"

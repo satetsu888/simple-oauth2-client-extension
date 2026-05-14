@@ -81,3 +81,260 @@ input[type="text"] {
     border: 1px solid lightgray;
     border-radius: 2px;
 }
+
+#ai_suggest_button {
+    color: #0275ff;
+    background-color: white;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    padding: 3px 5px;
+    cursor: pointer;
+    float: right;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+#ai_suggest_button:hover {
+    background-color: #f2f2f2;
+}
+
+#ai_suggest_button:active {
+    border-color: #0275ff;
+}
+
+#ai_suggest_button:disabled {
+    color: #999;
+    cursor: default;
+}
+
+#ai_suggest_button svg {
+    display: block;
+}
+
+.input-with-suggestion {
+    position: relative;
+    display: inline-block;
+}
+
+.suggestion-anchor {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.suggestion-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #0275ff;
+    cursor: pointer;
+    line-height: 1;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+}
+
+.suggestion-indicator:hover {
+    color: #005ecc;
+}
+
+.suggestion-indicator svg {
+    display: block;
+}
+
+.suggestion-popover {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.suggestion-value {
+    margin: 0;
+    padding: 3px 8px;
+    font-size: 11px;
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 3px;
+    color: #333;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.suggestion-value:hover {
+    background-color: #e8e8e8;
+    border-color: #0275ff;
+}
+
+.ai-dialog {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 12px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    background-color: #f9f9f9;
+}
+
+.ai-dialog-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.ai-dialog-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.ai-dialog-step-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.ai-dialog-step--done .ai-dialog-step-icon {
+    background-color: #0275ff;
+    color: white;
+}
+
+.ai-dialog-step--done .ai-dialog-step-label {
+    color: #333;
+}
+
+.ai-dialog-step-spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border: 2px solid #ddd;
+    border-top-color: #0275ff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.ai-dialog-step--active .ai-dialog-step-label {
+    color: #333;
+    font-weight: 600;
+}
+
+.ai-dialog-step--pending .ai-dialog-step-icon {
+    background-color: #ddd;
+    color: #888;
+}
+
+.ai-dialog-step--pending .ai-dialog-step-label {
+    color: #999;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.ai-dialog-download {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    padding: 8px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+}
+
+.ai-dialog-download-text {
+    font-size: 12px;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.ai-dialog-progress-track {
+    width: 100%;
+    height: 6px;
+    background-color: #ddd;
+    border-radius: 3px;
+}
+
+.ai-dialog-progress-bar {
+    height: 100%;
+    background-color: #0275ff;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.ai-dialog-download-note {
+    font-size: 10px;
+    color: #888;
+    margin-top: 4px;
+}
+
+.ai-dialog-cancel {
+    color: #666;
+    font-size: 11px;
+    background-color: white;
+    border: 1px solid lightgray;
+    border-radius: 3px;
+    padding: 2px 8px;
+    cursor: pointer;
+}
+
+.ai-dialog-cancel:hover {
+    background-color: #f2f2f2;
+}
+
+.ai-dialog-complete {
+    margin-top: 8px;
+}
+
+.ai-dialog-complete-text {
+    font-size: 12px;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.ai-dialog-complete-fields {
+    margin: 4px 0 8px 0;
+    padding-left: 20px;
+    font-size: 12px;
+    color: #333;
+}
+
+.ai-dialog-complete-fields li {
+    margin-bottom: 2px;
+}
+
+.ai-dialog-complete-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.ai-dialog-apply-all {
+    color: white;
+    font-size: 11px;
+    background-color: #0275ff;
+    border: 1px solid #0275ff;
+    border-radius: 3px;
+    padding: 2px 8px;
+    cursor: pointer;
+}
+
+.ai-dialog-apply-all:hover {
+    background-color: #005ecc;
+}
+

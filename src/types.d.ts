@@ -48,3 +48,54 @@ declare type AuthInputParams = {
     codeChallengeMethod: CodeChallengeMethod,
     tokenEndpointAuthMethod: TokenEndPointAuthMethod,
 };
+
+declare type FormFieldInfo = {
+    selector: string;
+    tagName: string;
+    type: string;
+    name: string;
+    id: string;
+    placeholder: string;
+    label: string;
+};
+
+declare type PageFormSnapshot = {
+    url: string;
+    title: string;
+    content: string;
+    formFields: FormFieldInfo[];
+};
+
+declare type SuggestableFieldValues = {
+    authorizationEndpoint: string;
+    tokenEndpoint: string;
+    clientId: string;
+    clientSecret: string;
+    scope: string;
+};
+
+declare type Suggestion = {
+    value: string;
+    fieldLabel: string;
+};
+
+declare type ExtensionMessage =
+    | { action: "submit"; value: AuthInputParams }
+    | { action: "log"; value: string }
+    | { action: "result"; value: string }
+    | { action: "ai-check-availability" }
+    | { action: "ai-suggest"; value: PageFormSnapshot }
+    | { action: "ai-status"; value: string }
+    | { action: "ai-download-progress"; value: number }
+    | { action: "ai-result"; value: AiSuggestions }
+    | { action: "ai-error"; value: string };
+
+declare type AiSuggestions = {
+    authorizationEndpoint?: Suggestion;
+    tokenEndpoint?: Suggestion;
+    clientId?: Suggestion;
+    clientSecret?: Suggestion;
+    scope?: Suggestion;
+    redirectUriFieldSelector?: string;
+    warnings: string[];
+};

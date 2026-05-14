@@ -1,10 +1,12 @@
 import { generateCodeVerifier, generateCodeChallenge, createURLSearchParams } from './utils'
+import { checkAvailability, suggest } from './aiAssist'
+
+const sendMsg = (msg: ExtensionMessage) => {
+    chrome.runtime.sendMessage(msg, () => void chrome.runtime.lastError);
+};
 
 const backgroundLog = (string: string): void => {
-    chrome.runtime.sendMessage({
-        action: "log",
-        value: string,
-    }, () => {});
+    sendMsg({ action: "log", value: string });
 }
 
 const buildAuthorizationUrl = async (params: AuthInputParams, PKCECodeVerifier: string) => {
@@ -87,10 +89,7 @@ const auth = async(params: AuthInputParams) => {
         backgroundLog(`[error] got malformed json response: ${response}, error: ${e}`)
       }
 
-      chrome.runtime.sendMessage({
-          action: "result",
-          value: JSON.stringify(response),
-      }, () => {});
+      sendMsg({ action: "result", value: JSON.stringify(response) });
   });
 }
 
@@ -140,13 +139,35 @@ const confidentialClientTokenRequest = async(tokenEndpoint: string, clientId: st
     return data
 }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "submit") {
-      auth(message.value).catch((error) => {
-        backgroundLog(`[error] ${error}`)
-      })
+chrome.runtime.onMessage.addListener((raw, sender, sendResponse) => {
+    const message = raw as ExtensionMessage;
+    switch (message.action) {
+      case "submit":
+        auth(message.value).catch((error) => {
+          backgroundLog(`[error] ${error}`)
+        });
+        break;
+      case "ai-check-availability":
+        checkAvailability().then((availability) => {
+          sendResponse({ availability });
+        });
+        return true;
+      case "ai-suggest":
+        suggest(
+          message.value,
+          (loaded, total) => {
+            sendMsg({ action: "ai-download-progress", value: total > 0 ? Math.round((loaded / total) * 100) : 0 });
+          },
+          (status) => {
+            sendMsg({ action: "ai-status", value: status });
+          },
+        ).then((suggestions) => {
+          sendMsg({ action: "ai-result", value: suggestions });
+        }).catch((error) => {
+          sendMsg({ action: "ai-error", value: error instanceof Error ? error.message : String(error) });
+        });
+        break;
     }
-    return true
 });
 
 chrome.sidePanel

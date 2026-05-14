@@ -1,27 +1,32 @@
 import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
+import SuggestionTip from './SuggestionTip'
+import RedirectUriInjector from './RedirectUriInjector'
 
 type Props = {
   config: AuthFormConfig
   redirectUri: string
+  suggestions?: AiSuggestions | null
+  fieldValues: SuggestableFieldValues
+  appliedFields: Set<string>
+  onFieldChange: (field: keyof SuggestableFieldValues, value: string) => void
+  onAppliedFieldAdd: (field: string) => void
   onSubmit: (params: AuthInputParams) => void
+  onInjectRedirectUri?: (selector: string) => void
 }
 
 const AuthForm = (props: Props) => {
-  const { config, redirectUri: defaultRedirectUri, onSubmit } = props;
+  const {
+    config, redirectUri, suggestions,
+    fieldValues, appliedFields, onFieldChange, onAppliedFieldAdd,
+    onSubmit, onInjectRedirectUri,
+  } = props;
 
-  const [authorizationEndpoint, setAuthorizationEndpoint] = useState<string>(config.authorizationEndpoint ?? "");
-  const [tokenEndpoint, setTokenEndpoint] = useState<string>(config.tokenEndpoint ?? "");
   const [clientType, setClientType] = useState<ClientType>(config.clientTypesSupported[0]);
-  const [clientId, setClientId] = useState<string>("");
-  const [clientSecret, setClientSecret] = useState<string>("");
-  const [scope, setScope] = useState<string>(config.scopesSupported ? config.scopesSupported[0] : "");
-  const [redirectUri, _] = useState<string>(defaultRedirectUri);
   const [codeChallengeMethod, setCodeChallengeMethod] = useState<CodeChallengeMethod>(config.codeChallengeMethodSupported[0]);
   const [tokenEndpointAuthMethod, setTokenEndpointAuthMethod] = useState<TokenEndPointAuthMethod>(config.tokenEndpointAuthMethodSupported[0]);
 
   const [copyButtonText, setCopyButtonText] = useState("copy");
-
   const redirectUriInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -36,20 +41,17 @@ const AuthForm = (props: Props) => {
         id="form"
         onSubmit={(e) => {
           e.preventDefault();
-
-          const params = {
-            authorizationEndpoint:
-              config.authorizationEndpoint || authorizationEndpoint,
-            tokenEndpoint: config.tokenEndpoint || tokenEndpoint,
+          onSubmit({
+            authorizationEndpoint: config.authorizationEndpoint || fieldValues.authorizationEndpoint,
+            tokenEndpoint: config.tokenEndpoint || fieldValues.tokenEndpoint,
             clientType,
-            clientId,
-            clientSecret,
-            scope,
+            clientId: fieldValues.clientId,
+            clientSecret: fieldValues.clientSecret,
+            scope: fieldValues.scope,
             redirectUri,
             codeChallengeMethod,
             tokenEndpointAuthMethod,
-          };
-          onSubmit(params);
+          });
         }}
       >
         <fieldset style={{ marginTop: "4px", marginBottom: "4px" }}>
@@ -74,17 +76,25 @@ const AuthForm = (props: Props) => {
                 marginBottom: "1px",
               }}
             >
-              <input
-                type="url"
-                name="authorization_endpoint"
-                placeholder="https://example.com/authrize"
-                size={40}
-                form="form"
-                required
-                value={config.authorizationEndpoint || authorizationEndpoint}
-                onChange={(e) => setAuthorizationEndpoint(e.target.value)}
-                readOnly={config.authorizationEndpoint !== null}
-              />
+              <span className="input-with-suggestion">
+                <input
+                  type="url"
+                  name="authorization_endpoint"
+                  placeholder="https://example.com/authrize"
+                  size={40}
+                  form="form"
+                  required
+                  value={config.authorizationEndpoint || fieldValues.authorizationEndpoint}
+                  onChange={(e) => onFieldChange('authorizationEndpoint', e.target.value)}
+                  readOnly={config.authorizationEndpoint !== null}
+                />
+                {suggestions?.authorizationEndpoint && config.authorizationEndpoint === null && !appliedFields.has('authorizationEndpoint') && (
+                  <SuggestionTip
+                    suggestion={suggestions.authorizationEndpoint}
+                    onApply={(v) => { onFieldChange('authorizationEndpoint', v); onAppliedFieldAdd('authorizationEndpoint'); }}
+                  />
+                )}
+              </span>
             </div>
 
             <div>
@@ -97,16 +107,24 @@ const AuthForm = (props: Props) => {
                 marginBottom: "1px",
               }}
             >
-              <input
-                type="url"
-                name="token_endpoint"
-                placeholder="https://api.example.com/token"
-                size={40}
-                required
-                value={config.tokenEndpoint || tokenEndpoint}
-                onChange={(e) => setTokenEndpoint(e.target.value)}
-                readOnly={config.tokenEndpoint !== null}
-              />
+              <span className="input-with-suggestion">
+                <input
+                  type="url"
+                  name="token_endpoint"
+                  placeholder="https://api.example.com/token"
+                  size={40}
+                  required
+                  value={config.tokenEndpoint || fieldValues.tokenEndpoint}
+                  onChange={(e) => onFieldChange('tokenEndpoint', e.target.value)}
+                  readOnly={config.tokenEndpoint !== null}
+                />
+                {suggestions?.tokenEndpoint && config.tokenEndpoint === null && !appliedFields.has('tokenEndpoint') && (
+                  <SuggestionTip
+                    suggestion={suggestions.tokenEndpoint}
+                    onApply={(v) => { onFieldChange('tokenEndpoint', v); onAppliedFieldAdd('tokenEndpoint'); }}
+                  />
+                )}
+              </span>
             </div>
           </div>
         </fieldset>
@@ -161,15 +179,21 @@ const AuthForm = (props: Props) => {
                 marginBottom: "1px",
               }}
             >
-              <input
-                type="text"
-                name="client_id"
-                size={40}
-                value={clientId}
-                onChange={(e) => {
-                  setClientId(e.target.value);
-                }}
-              />
+              <span className="input-with-suggestion">
+                <input
+                  type="text"
+                  name="client_id"
+                  size={40}
+                  value={fieldValues.clientId}
+                  onChange={(e) => onFieldChange('clientId', e.target.value)}
+                />
+                {suggestions?.clientId && !appliedFields.has('clientId') && (
+                  <SuggestionTip
+                    suggestion={suggestions.clientId}
+                    onApply={(v) => { onFieldChange('clientId', v); onAppliedFieldAdd('clientId'); }}
+                  />
+                )}
+              </span>
             </div>
 
             <div>
@@ -182,15 +206,21 @@ const AuthForm = (props: Props) => {
                 marginBottom: "1px",
               }}
             >
-              <input
-                type="text"
-                name="client_secret"
-                size={40}
-                value={clientSecret}
-                onChange={(e) => {
-                  setClientSecret(e.target.value);
-                }}
-              />
+              <span className="input-with-suggestion">
+                <input
+                  type="text"
+                  name="client_secret"
+                  size={40}
+                  value={fieldValues.clientSecret}
+                  onChange={(e) => onFieldChange('clientSecret', e.target.value)}
+                />
+                {suggestions?.clientSecret && !appliedFields.has('clientSecret') && (
+                  <SuggestionTip
+                    suggestion={suggestions.clientSecret}
+                    onApply={(v) => { onFieldChange('clientSecret', v); onAppliedFieldAdd('clientSecret'); }}
+                  />
+                )}
+              </span>
             </div>
 
             <div>
@@ -203,15 +233,21 @@ const AuthForm = (props: Props) => {
                 marginBottom: "1px",
               }}
             >
-              <input
-                type="text"
-                name="scope"
-                value={scope}
-                size={40}
-                onChange={(e) => {
-                  setScope(e.target.value);
-                }}
-              />
+              <span className="input-with-suggestion">
+                <input
+                  type="text"
+                  name="scope"
+                  value={fieldValues.scope}
+                  size={40}
+                  onChange={(e) => onFieldChange('scope', e.target.value)}
+                />
+                {suggestions?.scope && !appliedFields.has('scope') && (
+                  <SuggestionTip
+                    suggestion={suggestions.scope}
+                    onApply={(v) => { onFieldChange('scope', v); onAppliedFieldAdd('scope'); }}
+                  />
+                )}
+              </span>
             </div>
 
             <div>
@@ -224,19 +260,30 @@ const AuthForm = (props: Props) => {
                 marginBottom: "1px",
               }}
             >
-              <input
-                ref={redirectUriInputRef}
-                type="text"
-                id="redirect_uri"
-                name="redirect_uri"
-                value={redirectUri}
-                readOnly
-                size={40}
-                style={{
-                  backgroundColor: "lightgray",
-                  border: "1px solid lightgray",
-                }}
-              />
+              <span className="input-with-suggestion">
+                <input
+                  ref={redirectUriInputRef}
+                  type="text"
+                  id="redirect_uri"
+                  name="redirect_uri"
+                  value={redirectUri}
+                  readOnly
+                  size={40}
+                  style={{
+                    backgroundColor: "lightgray",
+                    border: "1px solid lightgray",
+                  }}
+                />
+                {suggestions?.redirectUriFieldSelector && !appliedFields.has('redirectUriFieldSelector') && onInjectRedirectUri && (
+                  <RedirectUriInjector
+                    selector={suggestions.redirectUriFieldSelector}
+                    onInject={(selector) => {
+                      onInjectRedirectUri(selector);
+                      onAppliedFieldAdd('redirectUriFieldSelector');
+                    }}
+                  />
+                )}
+              </span>
               <button
                 id="copy_redirect_uri_button"
                 type="button"
@@ -358,7 +405,7 @@ const AuthForm = (props: Props) => {
             </div>
           </div>
 
-          {/* 
+          {/*
           <div>
             <input type="checkbox" id="use_curl" name="use_curl" disabled />
             <label htmlFor="use_curl">
