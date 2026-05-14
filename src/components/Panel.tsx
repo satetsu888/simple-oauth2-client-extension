@@ -47,8 +47,10 @@ const Panel = (props: Props) => {
   const [suggestions, setSuggestions] = useState<AiSuggestions | null>(null)
   const [aiError, setAiError] = useState<string | null>(null)
 
+  const handleModelReadyRef = useRef<() => void>(() => {});
+
   useEffect(() => {
-    chrome.runtime.onMessage.addListener((raw) => {
+    const listener = (raw: any) => {
       const message = raw as ExtensionMessage;
       console.log(message);
 
@@ -74,6 +76,9 @@ const Panel = (props: Props) => {
             setAiError(message.value.warnings.join(', '));
           }
           break;
+        case "ai-model-ready":
+          handleModelReadyRef.current();
+          break;
         case "ai-error":
           setAiLoading(false);
           setAiDownloading(false);
@@ -94,11 +99,45 @@ const Panel = (props: Props) => {
           }
           break;
       }
-    });
+    };
 
+    chrome.runtime.onMessage.addListener(listener);
     return () => {
-      chrome.runtime.onMessage.removeListener(() => {});
+      chrome.runtime.onMessage.removeListener(listener);
     }
+  }, []);
+
+  useEffect(() => {
+    (window as any).__simulateAiDownload = () => {
+      setShowAiDialog(true);
+      setAiLoading(true);
+      setAiStep("preparing");
+      setAiDownloading(true);
+      setAiDownloadProgress(0);
+      let p = 0;
+      const id = setInterval(() => {
+        p += 10;
+        setAiDownloadProgress(p);
+        if (p >= 100) {
+          clearInterval(id);
+          setAiDownloading(false);
+          setAiStep("extracting");
+          setTimeout(() => {
+            setAiStep("thinking");
+            setTimeout(() => {
+              setAiLoading(false);
+              setAiStep("complete");
+              setSuggestions({
+                clientId: { value: "dummy-client-id", fieldLabel: "" },
+                scope: { value: "openid profile", fieldLabel: "" },
+                warnings: [],
+              });
+              setAppliedFields(new Set());
+            }, 1500);
+          }, 1500);
+        }
+      }, 500);
+    };
   }, []);
 
   useEffect(() => {
@@ -149,12 +188,18 @@ const Panel = (props: Props) => {
     return tab.id!;
   }, []);
 
-  const handleReadFromPage = useCallback(async () => {
+  const handleReadFromPage = useCallback(() => {
     setAiLoading(true);
     setAiError(null);
     setSuggestions(null);
-    setAiStep("extracting");
+    setAiStep("preparing");
     setShowAiDialog(true);
+    const msg: ExtensionMessage = { action: "ai-prepare" };
+    chrome.runtime.sendMessage(msg, () => void chrome.runtime.lastError);
+  }, []);
+
+  const handleModelReady = useCallback(async () => {
+    setAiStep("extracting");
     try {
       const tabId = await getTargetTabId();
       const results = await chrome.scripting.executeScript({
@@ -168,7 +213,8 @@ const Panel = (props: Props) => {
         setShowAiDialog(false);
         return;
       }
-      const msg: ExtensionMessage = { action: "ai-suggest", value: snapshot };
+      setAiStep("thinking");
+      const msg: ExtensionMessage = { action: "ai-analyze", value: snapshot };
       chrome.runtime.sendMessage(msg, () => void chrome.runtime.lastError);
     } catch (e) {
       setAiError(e instanceof Error ? e.message : String(e));
@@ -176,6 +222,8 @@ const Panel = (props: Props) => {
       setShowAiDialog(false);
     }
   }, [getTargetTabId]);
+
+  useEffect(() => { handleModelReadyRef.current = handleModelReady; }, [handleModelReady]);
 
   const handleInjectRedirectUri = useCallback(async (selector: string) => {
     try {

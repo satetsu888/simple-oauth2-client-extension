@@ -84,7 +84,9 @@ declare type ExtensionMessage =
     | { action: "log"; value: string }
     | { action: "result"; value: string }
     | { action: "ai-check-availability" }
-    | { action: "ai-suggest"; value: PageFormSnapshot }
+    | { action: "ai-prepare" }
+    | { action: "ai-model-ready" }
+    | { action: "ai-analyze"; value: PageFormSnapshot }
     | { action: "ai-status"; value: string }
     | { action: "ai-download-progress"; value: number }
     | { action: "ai-result"; value: AiSuggestions }

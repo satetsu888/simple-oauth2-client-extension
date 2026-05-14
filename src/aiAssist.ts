@@ -10,36 +10,37 @@ export async function checkAvailability(): Promise<AiAvailability> {
   });
 }
 
-export async function suggest(
-  snapshot: PageFormSnapshot,
+export async function prepareSession(
   onDownloadProgress: (loaded: number, total: number) => void,
-  onStatus: (status: string) => void,
-): Promise<AiSuggestions> {
+) {
   if (typeof LanguageModel === 'undefined') {
-    return { warnings: ['AI feature is not available'] };
+    throw new Error('AI feature is not available');
   }
-
-  console.log('[ai-suggest] snapshot:', snapshot);
-
-  const prompt = buildPrompt(snapshot);
-  console.log('[ai-suggest] prompt:', prompt);
 
   const availability = await LanguageModel.availability();
   const needsDownload = availability !== 'available';
 
-  onStatus('preparing');
-  const session = await LanguageModel.create({
+  return LanguageModel.create({
     monitor: needsDownload
       ? (m) => { m.addEventListener('downloadprogress', (e) => onDownloadProgress(e.loaded, e.total)); }
       : undefined,
   });
+}
+
+export async function analyze(
+  session: Awaited<ReturnType<typeof LanguageModel.create>>,
+  snapshot: PageFormSnapshot,
+): Promise<AiSuggestions> {
+  console.log('[ai-analyze] snapshot:', snapshot);
+
+  const prompt = buildPrompt(snapshot);
+  console.log('[ai-analyze] prompt:', prompt);
 
   try {
-    onStatus('thinking');
     const raw = await session.prompt(prompt);
-    console.log('[ai-suggest] raw response:', raw);
+    console.log('[ai-analyze] raw response:', raw);
     const result = parseResponse(raw);
-    console.log('[ai-suggest] parsed result:', result);
+    console.log('[ai-analyze] parsed result:', result);
     return result;
   } finally {
     session.destroy();

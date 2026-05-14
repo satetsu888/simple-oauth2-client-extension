@@ -1,5 +1,7 @@
 import { generateCodeVerifier, generateCodeChallenge, createURLSearchParams } from './utils'
-import { checkAvailability, suggest } from './aiAssist'
+import { checkAvailability, prepareSession, analyze } from './aiAssist'
+
+let currentAiSession: Awaited<ReturnType<typeof prepareSession>> | null = null;
 
 const sendMsg = (msg: ExtensionMessage) => {
     chrome.runtime.sendMessage(msg, () => void chrome.runtime.lastError);
@@ -152,18 +154,28 @@ chrome.runtime.onMessage.addListener((raw, sender, sendResponse) => {
           sendResponse({ availability });
         });
         return true;
-      case "ai-suggest":
-        suggest(
-          message.value,
+      case "ai-prepare":
+        prepareSession(
           (loaded, total) => {
             sendMsg({ action: "ai-download-progress", value: total > 0 ? Math.round((loaded / total) * 100) : 0 });
           },
-          (status) => {
-            sendMsg({ action: "ai-status", value: status });
-          },
-        ).then((suggestions) => {
+        ).then((session) => {
+          currentAiSession = session;
+          sendMsg({ action: "ai-model-ready" });
+        }).catch((error) => {
+          sendMsg({ action: "ai-error", value: error instanceof Error ? error.message : String(error) });
+        });
+        break;
+      case "ai-analyze":
+        if (!currentAiSession) {
+          sendMsg({ action: "ai-error", value: "AI model not prepared" });
+          break;
+        }
+        analyze(currentAiSession, message.value).then((suggestions) => {
+          currentAiSession = null;
           sendMsg({ action: "ai-result", value: suggestions });
         }).catch((error) => {
+          currentAiSession = null;
           sendMsg({ action: "ai-error", value: error instanceof Error ? error.message : String(error) });
         });
         break;

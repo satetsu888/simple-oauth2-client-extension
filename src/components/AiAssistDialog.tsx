@@ -6,8 +6,8 @@ type Step = {
 }
 
 const STEPS: Step[] = [
-  { key: 'extracting', label: 'Extracting page content' },
   { key: 'preparing', label: 'Preparing AI model' },
+  { key: 'extracting', label: 'Extracting page content' },
   { key: 'thinking', label: 'Analyzing with AI' },
   { key: 'complete', label: 'Apply suggestions' },
 ];
@@ -62,7 +62,7 @@ const AiAssistDialog = ({ currentStep, downloading, downloadProgress, suggestion
           );
         })}
       </div>
-      {downloading && (
+      {downloading && currentStep === 'preparing' && (
         <div className="ai-dialog-download">
           <div className="ai-dialog-download-text">
             Downloading model... {downloadProgress}%
@@ -74,7 +74,8 @@ const AiAssistDialog = ({ currentStep, downloading, downloadProgress, suggestion
             />
           </div>
           <div className="ai-dialog-download-note">
-            First time only. Requires 22 GB+ free space.
+            First time only. This may take a while.
+            {' '}<a href="https://developer.chrome.com/docs/ai/prompt-api" target="_blank" rel="noopener noreferrer">Learn more</a>
           </div>
         </div>
       )}
