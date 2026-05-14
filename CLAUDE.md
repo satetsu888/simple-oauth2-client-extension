@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-開発用途で OAuth2 Authorization Code Flow のアクセストークン取得を簡単にする Chrome 拡張機能 (Manifest V3)。DevTools にパネルを追加し、認可 URL の組み立て・リダイレクト・コード→トークン交換までを一気通貫で行う。
+開発用途で OAuth2 Authorization Code Flow のアクセストークン取得を簡単にする Chrome 拡張機能 (Manifest V3)。DevTools パネルおよび Side Panel の両方から利用でき、認可 URL の組み立て・リダイレクト・コード→トークン交換までを一気通貫で行う。Chrome の Prompt API (Gemini Nano) を使ったオンデバイス AI アシスト機能により、ページ上の OAuth 設定値の自動検出・フォームへの redirect_uri 注入にも対応。
 
 ## コマンド
 
@@ -21,17 +21,42 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 3 つの webpack エントリーポイントが Chrome 拡張の異なるコンテキストで動作する。
 
 - **`src/devtools.ts`** — DevTools 拡張ポイントから "Simple OAuth2 Client" パネルを登録するだけの薄い層 (`devtools.html` がロード)。
-- **`src/panel.tsx` → `src/components/Panel.tsx` / `AuthForm.tsx`** — DevTools パネル本体 (React)。フォームの状態管理と background との `chrome.runtime` メッセージ通信、結果表示を担当する。`panel.html` がロード。
-- **`src/background.ts`** — Service Worker。`chrome.identity.launchWebAuthFlow` で認可リダイレクトを受け取り、`code` を取り出してトークンエンドポイントに POST する。**`fetch` などブラウザ API を使う OAuth 通信処理はすべてここに集約**されている。
+- **`src/panel.tsx` → `src/components/Panel.tsx`** — DevTools パネル / Side Panel の本体 (React)。フォームの状態管理、AI アシスト制御、background との `chrome.runtime` メッセージ通信、結果表示を担当する。`panel.html` がロード。
+- **`src/background.ts`** — Service Worker。OAuth 通信処理 (`chrome.identity.launchWebAuthFlow` + トークン交換) と AI セッション管理を担当。**`fetch` などブラウザ API を使う処理と `LanguageModel` API の呼び出しはすべてここに集約**されている。
+
+### コンポーネント構成
+
+- **`Panel.tsx`** — トップレベル。AI アシストのステート管理、`SuggestableFieldValues` の状態をリフトアップして保持し、AuthForm に制御コンポーネントとして渡す。
+- **`AuthForm.tsx`** — OAuth フォーム。`fieldValues` / `appliedFields` を props で受け取る制御コンポーネント。ローカル状態は clientType / codeChallengeMethod / tokenEndpointAuthMethod のみ。
+- **`AiAssistDialog.tsx`** — AI アシストの進捗ダイアログ。4 ステップ (preparing → extracting → thinking → complete) を表示。complete ステップで検出フィールド一覧と Apply All / Close ボタンを提示。
+- **`SuggestionTip.tsx`** — フォーム入力欄内に表示される sparkle アイコン。AI サジェストがある場合にクリックで値を適用。
+- **`RedirectUriInjector.tsx`** — redirect_uri 入力欄内の sparkle。クリックでページ側のフォームに redirect_uri を注入。
 
 ### メッセージプロトコル (panel ↔ background)
 
-`chrome.runtime.sendMessage` を介した非同期メッセージで連携:
+`chrome.runtime.sendMessage` を介した非同期メッセージで連携。`ExtensionMessage` 型 (discriminated union) で型安全に定義。
 
+**OAuth フロー:**
 - panel → background: `{ action: "submit", value: AuthInputParams }`
-- background → panel: `{ action: "log", value: string }` (進捗ログを追記表示) / `{ action: "result", value: string }` (トークンレスポンスの JSON 文字列)
+- background → panel: `{ action: "log", value: string }` / `{ action: "result", value: string }`
 
-`AuthInputParams` などの型は `src/types.d.ts` で `declare type` としてグローバル宣言されているため import 不要。
+**AI アシストフロー:**
+1. panel → background: `{ action: "ai-prepare" }` — AI モデルの準備 (必要ならダウンロード)
+2. background → panel: `{ action: "ai-download-progress", value: number }` — ダウンロード進捗 (0-100)
+3. background → panel: `{ action: "ai-model-ready" }` — モデル準備完了
+4. panel: `chrome.scripting.executeScript` でページのスナップショットを取得
+5. panel → background: `{ action: "ai-analyze", value: PageFormSnapshot }` — ページ分析を依頼
+6. background → panel: `{ action: "ai-result", value: AiSuggestions }` — 分析結果
+
+型は `src/types.d.ts` で `declare type` としてグローバル宣言されているため import 不要。
+
+### AI アシスト機能
+
+Chrome の Prompt API (`LanguageModel`) を使ったオンデバイス AI 機能。
+
+- **`src/aiAssist.ts`** — AI セッション管理。`checkAvailability()` / `prepareSession()` / `analyze()` の 3 関数。モデル準備とページ分析を分離し、background.ts が `currentAiSession` として準備済みセッションを保持。
+- **`src/pageSnapshot.ts`** — ページのスナップショット収集。`collectPageSnapshot()` で URL・タイトル・本文テキスト・フォーム要素メタデータ (`FormFieldInfo[]`) を返す。`chrome.scripting.executeScript` で実行されるため、Promise.then パターンを使用 (async/await は es6 ターゲットでのシリアライズ制約のため不可)。
+- AI はページ上の client ID / client secret / scope / エンドポイント URL / redirect_uri 入力欄のセレクタを検出する。明確にラベルされた値のみ抽出し、曖昧なものは拾わない方針。
 
 ### Provider 設定の仕組み
 
@@ -41,7 +66,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### redirect_uri について
 
-`https://<chrome.runtime.id>.chromiumapp.org/` を使う (`chrome.identity` API の仕様)。ユーザーは表示された redirect_uri を OAuth プロバイダ側のアプリ設定にコピペして登録する必要がある。
+`https://<chrome.runtime.id>.chromiumapp.org/` を使う (`chrome.identity` API の仕様)。ユーザーは表示された redirect_uri を OAuth プロバイダ側のアプリ設定にコピペして登録する必要がある。AI アシスト機能により、ページ上の redirect_uri 入力欄を検出し、`chrome.scripting.executeScript` でワンクリック注入も可能。
 
 ### PKCE / Token Endpoint Auth Method
 
@@ -53,3 +78,4 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `src/types.d.ts` は `declare type` のグローバル宣言。import せずに使う。
 - `manifest.json` の `version` と Chrome Web Store のリリースは別管理 (リリース時に手動で更新)。
 - `dist/` は gitignore 対象。`zip` タスク実行前に `npm run build` でビルド成果物を生成する (`zip` スクリプトが内部で `npm run build` を呼ぶため通常は意識不要)。
+- `pageSnapshot.ts` は `chrome.scripting.executeScript` 経由で実行されるため、async/await を使わず Promise.then パターンで記述する。
