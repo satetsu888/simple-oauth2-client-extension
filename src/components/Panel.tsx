@@ -267,9 +267,9 @@ const Panel = (props: Props) => {
     if (suggestions.clientId) { newValues.clientId = suggestions.clientId; applied.add('clientId'); }
     if (suggestions.clientSecret) { newValues.clientSecret = suggestions.clientSecret; applied.add('clientSecret'); }
     if (suggestions.scope) { newValues.scope = suggestions.scope; applied.add('scope'); }
-    if (suggestions.redirectUriFieldSelector) {
-      handleInjectRedirectUri(suggestions.redirectUriFieldSelector);
-      applied.add('redirectUriFieldSelector');
+    if (suggestions.redirectUriField) {
+      handleInjectRedirectUri(suggestions.redirectUriField.selector);
+      applied.add('redirectUriField');
     }
     setFieldValues(newValues);
     setAppliedFields(applied);

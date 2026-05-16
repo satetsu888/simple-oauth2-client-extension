@@ -274,12 +274,12 @@ const AuthForm = (props: Props) => {
                     border: "1px solid lightgray",
                   }}
                 />
-                {suggestions?.redirectUriFieldSelector && !appliedFields.has('redirectUriFieldSelector') && onInjectRedirectUri && (
+                {suggestions?.redirectUriField && !appliedFields.has('redirectUriField') && onInjectRedirectUri && (
                   <RedirectUriInjector
-                    selector={suggestions.redirectUriFieldSelector}
+                    selector={suggestions.redirectUriField.selector}
                     onInject={(selector) => {
                       onInjectRedirectUri(selector);
-                      onAppliedFieldAdd('redirectUriFieldSelector');
+                      onAppliedFieldAdd('redirectUriField');
                     }}
                   />
                 )}

@@ -35,7 +35,17 @@ const responseConstraint = {
     clientId: { type: 'string' },
     clientSecret: { type: 'string' },
     scope: { type: 'string' },
-    redirectUriFieldSelector: { type: 'string' },
+    redirectUriField: {
+      type: 'object',
+      properties: {
+        selector: { type: 'string' },
+        label: { type: 'string' },
+        name: { type: 'string' },
+        id: { type: 'string' },
+      },
+      required: ['selector'],
+      additionalProperties: false,
+    },
   },
   additionalProperties: false,
 } as const;
@@ -84,7 +94,7 @@ Based on the page content, identify any OAuth-related values:
 - clientId: client ID value if found
 - clientSecret: client secret value if found
 - scope: space-separated scopes if found
-- redirectUriFieldSelector: CSS selector of the form field where the user should enter their redirect URI / callback URL, if such a field exists on the page
+- redirectUriField: if a form field exists on the page where the user should enter their redirect URI / callback URL, return an object with: selector (CSS selector), label (associated label text), name (name attribute), id (id attribute)
 
 Rules:
 - Only include keys where the value is explicitly and clearly shown on the page (e.g. labeled as "Client ID", "Client Secret", etc.).
@@ -124,8 +134,16 @@ function parseResponse(raw: string): AiSuggestions {
     result.tokenEndpoint = parsed.tokenEndpoint;
   }
 
-  if (typeof parsed.redirectUriFieldSelector === 'string' && parsed.redirectUriFieldSelector) {
-    result.redirectUriFieldSelector = parsed.redirectUriFieldSelector;
+  if (parsed.redirectUriField && typeof parsed.redirectUriField === 'object') {
+    const field = parsed.redirectUriField as Record<string, unknown>;
+    if (typeof field.selector === 'string' && field.selector) {
+      result.redirectUriField = {
+        selector: field.selector,
+        label: typeof field.label === 'string' ? field.label : '',
+        name: typeof field.name === 'string' ? field.name : '',
+        id: typeof field.id === 'string' ? field.id : '',
+      };
+    }
   }
 
   return result;

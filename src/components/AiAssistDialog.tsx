@@ -18,7 +18,7 @@ const FIELD_LABELS: Record<string, string> = {
   clientId: 'Client ID',
   clientSecret: 'Client Secret',
   scope: 'Scope',
-  redirectUriFieldSelector: 'Redirect URI (page input)',
+  redirectUriField: 'Redirect URI (page input)',
 };
 
 type Props = {
@@ -37,7 +37,7 @@ const AiAssistDialog = ({ currentStep, downloading, downloadProgress, suggestion
 
   const foundFields = isComplete && suggestions
     ? Object.keys(FIELD_LABELS).filter(key => {
-        if (key === 'redirectUriFieldSelector') return !!suggestions.redirectUriFieldSelector;
+        if (key === 'redirectUriField') return !!suggestions.redirectUriField;
         return !!(suggestions as any)[key];
       })
     : [];
@@ -85,9 +85,20 @@ const AiAssistDialog = ({ currentStep, downloading, downloadProgress, suggestion
             <>
               <div className="ai-dialog-complete-text">Found suggestions for:</div>
               <ul className="ai-dialog-complete-fields">
-                {foundFields.map(key => (
-                  <li key={key}>{FIELD_LABELS[key]}</li>
-                ))}
+                {foundFields.map(key => {
+                  let displayValue: string;
+                  if (key === 'redirectUriField' && suggestions!.redirectUriField) {
+                    const f = suggestions!.redirectUriField;
+                    displayValue = f.label || f.name || f.id || f.selector;
+                  } else {
+                    displayValue = (suggestions as any)[key];
+                  }
+                  return (
+                    <li key={key}>
+                      {FIELD_LABELS[key]}: <pre className="ai-dialog-field-value">{displayValue}</pre>
+                    </li>
+                  );
+                })}
               </ul>
             </>
           ) : (

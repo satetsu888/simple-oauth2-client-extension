@@ -93,6 +93,11 @@ declare type AiSuggestions = {
     clientId?: string;
     clientSecret?: string;
     scope?: string;
-    redirectUriFieldSelector?: string;
+    redirectUriField?: {
+        selector: string;
+        label: string;
+        name: string;
+        id: string;
+    };
     warnings: string[];
 };
