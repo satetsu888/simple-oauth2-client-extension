@@ -27,6 +27,19 @@ export async function prepareSession(
   });
 }
 
+const responseConstraint = {
+  type: 'object',
+  properties: {
+    authorizationEndpoint: { type: 'string' },
+    tokenEndpoint: { type: 'string' },
+    clientId: { type: 'string' },
+    clientSecret: { type: 'string' },
+    scope: { type: 'string' },
+    redirectUriFieldSelector: { type: 'string' },
+  },
+  additionalProperties: false,
+} as const;
+
 export async function analyze(
   session: Awaited<ReturnType<typeof LanguageModel.create>>,
   snapshot: PageFormSnapshot,
@@ -37,7 +50,7 @@ export async function analyze(
   console.log('[ai-analyze] prompt:', prompt);
 
   try {
-    const raw = await session.prompt(prompt);
+    const raw = await session.prompt(prompt, { responseConstraint });
     console.log('[ai-analyze] raw response:', raw);
     const result = parseResponse(raw);
     console.log('[ai-analyze] parsed result:', result);
@@ -65,19 +78,17 @@ Page Title: ${snapshot.title}
 Page content:
 ${snapshot.content}${formFieldsSection}
 
-Based on the page content, identify any OAuth-related values. Respond ONLY with a JSON object:
-{
-  "authorizationEndpoint": "authorization endpoint URL if found",
-  "tokenEndpoint": "token endpoint URL if found",
-  "clientId": "client ID value if found",
-  "clientSecret": "client secret value if found",
-  "scope": "space-separated scopes if found",
-  "redirectUriFieldSelector": "CSS selector of the form field where the user should enter their redirect URI / callback URL, if such a field exists on the page"
-}
+Based on the page content, identify any OAuth-related values:
+- authorizationEndpoint: authorization endpoint URL if found
+- tokenEndpoint: token endpoint URL if found
+- clientId: client ID value if found
+- clientSecret: client secret value if found
+- scope: space-separated scopes if found
+- redirectUriFieldSelector: CSS selector of the form field where the user should enter their redirect URI / callback URL, if such a field exists on the page
 
 Rules:
 - Only include keys where the value is explicitly and clearly shown on the page (e.g. labeled as "Client ID", "Client Secret", etc.).
-- Do NOT guess or infer values from ambiguous content. If the page is not an OAuth settings or API documentation page, return an empty JSON object {}.
+- Do NOT guess or infer values from ambiguous content. If the page is not an OAuth settings or API documentation page, return an empty object.
 - Omit any key you are not highly confident about.`;
 }
 
@@ -88,37 +99,29 @@ function parseResponse(raw: string): AiSuggestions {
   try {
     parsed = JSON.parse(raw);
   } catch {
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) {
-      return { warnings: ['Failed to parse JSON from AI response'] };
-    }
-    try {
-      parsed = JSON.parse(match[0]);
-    } catch {
-      return { warnings: ['Failed to parse JSON from AI response'] };
-    }
+    return { warnings: ['Failed to parse JSON from AI response'] };
   }
 
   const result: AiSuggestions = { warnings };
 
   if (typeof parsed.clientId === 'string' && parsed.clientId) {
-    result.clientId = { value: parsed.clientId, fieldLabel: '' };
+    result.clientId = parsed.clientId;
   }
 
   if (typeof parsed.clientSecret === 'string' && parsed.clientSecret) {
-    result.clientSecret = { value: parsed.clientSecret, fieldLabel: '' };
+    result.clientSecret = parsed.clientSecret;
   }
 
   if (typeof parsed.scope === 'string' && parsed.scope) {
-    result.scope = { value: parsed.scope, fieldLabel: '' };
+    result.scope = parsed.scope;
   }
 
   if (typeof parsed.authorizationEndpoint === 'string' && isUrl(parsed.authorizationEndpoint)) {
-    result.authorizationEndpoint = { value: parsed.authorizationEndpoint, fieldLabel: '' };
+    result.authorizationEndpoint = parsed.authorizationEndpoint;
   }
 
   if (typeof parsed.tokenEndpoint === 'string' && isUrl(parsed.tokenEndpoint)) {
-    result.tokenEndpoint = { value: parsed.tokenEndpoint, fieldLabel: '' };
+    result.tokenEndpoint = parsed.tokenEndpoint;
   }
 
   if (typeof parsed.redirectUriFieldSelector === 'string' && parsed.redirectUriFieldSelector) {

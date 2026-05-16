@@ -128,8 +128,8 @@ const Panel = (props: Props) => {
               setAiLoading(false);
               setAiStep("complete");
               setSuggestions({
-                clientId: { value: "dummy-client-id", fieldLabel: "" },
-                scope: { value: "openid profile", fieldLabel: "" },
+                clientId: "dummy-client-id",
+                scope: "openid profile",
                 warnings: [],
               });
               setAppliedFields(new Set());
@@ -257,16 +257,16 @@ const Panel = (props: Props) => {
     const newValues = { ...fieldValues };
     const applied = new Set(appliedFields);
     if (suggestions.authorizationEndpoint && authConfig.authorizationEndpoint === null) {
-      newValues.authorizationEndpoint = suggestions.authorizationEndpoint.value;
+      newValues.authorizationEndpoint = suggestions.authorizationEndpoint;
       applied.add('authorizationEndpoint');
     }
     if (suggestions.tokenEndpoint && authConfig.tokenEndpoint === null) {
-      newValues.tokenEndpoint = suggestions.tokenEndpoint.value;
+      newValues.tokenEndpoint = suggestions.tokenEndpoint;
       applied.add('tokenEndpoint');
     }
-    if (suggestions.clientId) { newValues.clientId = suggestions.clientId.value; applied.add('clientId'); }
-    if (suggestions.clientSecret) { newValues.clientSecret = suggestions.clientSecret.value; applied.add('clientSecret'); }
-    if (suggestions.scope) { newValues.scope = suggestions.scope.value; applied.add('scope'); }
+    if (suggestions.clientId) { newValues.clientId = suggestions.clientId; applied.add('clientId'); }
+    if (suggestions.clientSecret) { newValues.clientSecret = suggestions.clientSecret; applied.add('clientSecret'); }
+    if (suggestions.scope) { newValues.scope = suggestions.scope; applied.add('scope'); }
     if (suggestions.redirectUriFieldSelector) {
       handleInjectRedirectUri(suggestions.redirectUriFieldSelector);
       applied.add('redirectUriFieldSelector');

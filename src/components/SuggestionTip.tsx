@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useState, useRef, useEffect, useCallback } from 'react'
 
 type Props = {
-  suggestion: Suggestion
+  suggestion: string
   onApply: (value: string) => void
 }
 
@@ -64,9 +64,9 @@ const SuggestionTip = ({ suggestion, onApply }: Props) => {
         <div ref={popoverRef} className="suggestion-popover">
           <pre
             className="suggestion-value"
-            onClick={() => onApply(suggestion.value)}
+            onClick={() => onApply(suggestion)}
             title="Click to apply"
-          >{suggestion.value}</pre>
+          >{suggestion}</pre>
         </div>
       )}
     </span>

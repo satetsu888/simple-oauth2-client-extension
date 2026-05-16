@@ -74,11 +74,6 @@ declare type SuggestableFieldValues = {
     scope: string;
 };
 
-declare type Suggestion = {
-    value: string;
-    fieldLabel: string;
-};
-
 declare type ExtensionMessage =
     | { action: "submit"; value: AuthInputParams }
     | { action: "log"; value: string }
@@ -93,11 +88,11 @@ declare type ExtensionMessage =
     | { action: "ai-error"; value: string };
 
 declare type AiSuggestions = {
-    authorizationEndpoint?: Suggestion;
-    tokenEndpoint?: Suggestion;
-    clientId?: Suggestion;
-    clientSecret?: Suggestion;
-    scope?: Suggestion;
+    authorizationEndpoint?: string;
+    tokenEndpoint?: string;
+    clientId?: string;
+    clientSecret?: string;
+    scope?: string;
     redirectUriFieldSelector?: string;
     warnings: string[];
 };
